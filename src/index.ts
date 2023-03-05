@@ -12,6 +12,12 @@ app.get("/", (req: Request, res: Response) => {
   res.send("QAA API");
 });
 
+app.get("/api/health", (req: Request, res: Response) => {
+  res.json({
+    status: "ok",
+  });
+});
+
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
