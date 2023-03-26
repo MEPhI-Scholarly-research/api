@@ -11,16 +11,25 @@ const port = process.env.PORT || DEFAULT_PORT;
 
 app.use(cors());
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("QAA API");
-});
+// handlers
 
-app.get("/api/health", (req: Request, res: Response) => {
+function QuizCreate(req: Request, res: Response) {
+  console.log(`Create`);
+  
+}
+
+
+
+// init
+
+app.get("/quiz", QuizCreate);
+
+app.get("/ping", (req: Request, res: Response) => {
   res.json({
-    status: "ok",
+    status: "pong",
   });
 });
 
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  console.log(`⚡️[server]: Server is running at http://0.0.0.0:${port}`);
 });
