@@ -1,0 +1,67 @@
+version: "2.3"
+
+services:
+  postgres:
+    container_name: quan-postgres
+    image: postgres:14.1
+    environment:
+      - POSTGRES_DB=quan_db
+      - POSTGRES_USER=quan
+      - POSTGRES_PASSWORD=Password12345
+    ports:
+      - 5432:5432
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d
+      - ./data/.pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quan -d quan_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    networks:
+      - main_network
+
+  redis:
+    container_name: quan-redis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass Password12345
+    volumes: 
+      - ./data/.redis:/data
+    healthcheck:
+        test: ["CMD-SHELL", "redis-cli --raw incr ping"]
+        interval: 5s
+        timeout: 3s
+        retries: 3
+    networks:
+      - main_network
+
+  service:
+    build: ./
+    container_name: quan
+    image: quan-img
+    restart: on-failure
+    environment:
+      - POSTGRES_DB=quan_db
+      - POSTGRES_USER=quan
+      - POSTGRES_PASSWORD=Password12345
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - REDIS_PASSWORD=Password12345
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - main_network
+
+networks:
+  main_network:
+    driver: bridge
