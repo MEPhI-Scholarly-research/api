@@ -9,12 +9,11 @@ export class SocketQuiz {
   }
 
   public sendQuiz(id?: string) {
-    // достаем какой-то квиз по id
-
     if (id === undefined) {
       logger.error("id must be not undefined");
     }
 
+    // достаем какой-то квиз из бд по id
     if (id === "1234") {
       const fakeQuiz = {
         id: "34f0af53",
