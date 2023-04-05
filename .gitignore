@@ -3,3 +3,5 @@
 *.local.*
 .vscode/
 node_modules/
+data
+dist
