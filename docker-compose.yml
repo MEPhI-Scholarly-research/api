@@ -42,7 +42,7 @@ services:
     build: ./
     container_name: quan
     image: quan-img
-    restart: on-failure
+    restart: always
     environment:
       - POSTGRES_DB=quan_db
       - POSTGRES_USER=quan

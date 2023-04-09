@@ -1,0 +1,1 @@
+SELECT salt FROM quan.tokens WHERE uuid=$1;

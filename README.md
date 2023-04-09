@@ -10,6 +10,7 @@ make build
 
 ```sh
 npm install
+npm install ts-node --save-dev
 ```
 ### Dev run
 

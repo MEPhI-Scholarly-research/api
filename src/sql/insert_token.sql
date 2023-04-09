@@ -1,0 +1,1 @@
+INSERT INTO quan.tokens (salt) VALUES ($1) RETURNING uuid;
