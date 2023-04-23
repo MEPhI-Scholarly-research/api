@@ -4,7 +4,7 @@ import cors from "cors";
 import http from "http";
 
 import { DEFAULT_HTTP_PORT } from "@/constants";
-import { expressLoggerMiddleware } from "@/middlewares/logger/httpLogger";
+import { authMiddleware, expressLoggerMiddleware } from "@/middlewares";
 import socketIIFE from "@/sockets";
 import routesIIFE from "@/http/routes";
 
@@ -17,6 +17,7 @@ const port = process.env.PORT || DEFAULT_HTTP_PORT;
 // apply middlewares
 app.use(cors());
 app.use(expressLoggerMiddleware);
+app.use(authMiddleware);
 
 // init IIFE
 socketIIFE(server);
