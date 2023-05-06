@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
+import bodyParser from "body-parser";
 
 import { DEFAULT_HTTP_PORT } from "@/constants";
 import { authMiddleware, expressLoggerMiddleware } from "@/middlewares";
@@ -16,6 +17,7 @@ const port = process.env.PORT || DEFAULT_HTTP_PORT;
 
 // apply middlewares
 app.use(cors());
+app.use(bodyParser.json());
 app.use(expressLoggerMiddleware);
 app.use(authMiddleware);
 
