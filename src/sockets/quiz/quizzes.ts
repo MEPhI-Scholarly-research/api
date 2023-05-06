@@ -1,4 +1,9 @@
 import { logger } from "@/app/logger";
+import {
+  event_quiz_get_next_card,
+  event_quiz_init_card,
+} from "@/shared/socket";
+import { SocketMetaPayload } from "@/shared/types";
 import { Socket } from "socket.io";
 
 export class SocketQuiz {
@@ -8,28 +13,49 @@ export class SocketQuiz {
     this.socket = socket;
   }
 
-  public sendQuiz(id?: string) {
-    if (id === undefined) {
-      logger.error("id must be not undefined");
-    }
+  /**
+   * Слушает `event_quiz_init_card` и отсылает первую карточку
+   */
+  public listenGetFirstCard() {
+    this.socket.on(event_quiz_init_card, (data: SocketMetaPayload) => {
+      // проверки на токены...
 
-    // достаем какой-то квиз из бд по id
-    if (id === "1234") {
-      const fakeQuiz = {
-        id: "34f0af53",
-        active: true,
-        data: [
-          {
-            id: "aa13f0c3c1201f36787fd3397c0bfb4e",
+      // достаем первую карточку
+      setTimeout(() => {
+        this.socket.emit(event_quiz_init_card, {
+          payload: {
+            id: "76a6d4e9-9025-4b1e-86bb-b682c18fb5b3",
+            title: "Input some number",
+            description:
+              "You can do this quiz online or print it on paper. It tests what you learned on our basic grammar rules page.",
             type: "input",
-            title: "How are you?",
-            description: "Fine?",
-            answer: "^(fine|good)$",
+            answer: "/\\d+/",
           },
-        ],
-      };
+        });
+      }, 2000);
+    });
+  }
 
-      this.socket.emit("quiz.content", fakeQuiz);
-    }
+  /**
+   * Слушает `event_quiz_get_next_card` и отсылает следующую карточку
+   */
+  public listenNextCard() {
+    this.socket.on(event_quiz_get_next_card, (data: SocketMetaPayload) => {
+      // проверки на токены...
+
+      // достаем следующую карточку
+      setTimeout(() => {
+        this.socket.emit(event_quiz_get_next_card, {
+          payload: {
+            id: "76a6d4e9-9025-4b1e-86bb-b682c18fb5b3",
+            title: "Input some number? ",
+            description:
+              "You can do this quiz online or print it on paper. It tests what you learned on our basic grammar rules page.",
+            type: "input",
+            answer: "/\\d+/",
+          },
+        });
+      }, 2000);
+    });
   }
 }
