@@ -3,38 +3,126 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP SCHEMA IF EXISTS quan CASCADE;
 CREATE SCHEMA IF NOT EXISTS quan;
 
+-- TABLES
+
+-- auth
+
 CREATE TABLE quan.users (
-  uuid TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
-  passhash TEXT CONSTRAINT users_passhash_size CHECK (LENGTH(passhash) == 32)
-   TEXT 
+  "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "username" TEXT NOT NULL UNIQUE,
+  "passhash" TEXT NOT NULL
 );
 
-CREATE TABLE quan.tests (
-  uuid TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
-  owner TEXT NOT NULL,
-  CONSTRAINT fk_tests_users_pk
-		FOREIGN KEY(owner)
-			REFERENCES quan.users(uuid)
+CREATE TABLE quan.tokens (
+  "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "salt" TEXT NOT NULL
+);
+
+-- types
+
+CREATE TABLE quan.quiz_types (
+  "id" SERIAL PRIMARY KEY,
+  "textid" TEXT NOT NULL UNIQUE,
+  "title"TEXT  NOT NULL,
+  "description" TEXT NOT NULL
+);
+
+CREATE TABLE quan.question_types (
+  "id" SERIAL PRIMARY KEY,
+  "textid" TEXT NOT NULL UNIQUE,
+  "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL
+);
+
+-- quizzes
+
+CREATE TABLE quan.quizzes (
+  "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "owner" TEXT NOT NULL,
+  "type" INTEGER NOT NULL,
+  "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "time_limit" INTEGER DEFAULT NULL,
+  CONSTRAINT fk_quizzes__owner__users_pk
+    FOREIGN KEY("owner")
+      REFERENCES quan.users("uuid"),
+  CONSTRAINT fk_quizzes__type__quiz_types_pk
+    FOREIGN KEY("type")
+      REFERENCES quan.quiz_types("id")
 );
 
 CREATE TABLE quan.questions (
-  uuid TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
-  test TEXT NOT NULL,
-  title TEXT CONSTRAINT questions_title_size CHECK (LENGTH(title) <= 64),
-  answers BJSON NOT NULL,
-  CONSTRAINT fk_questions_tests_pk
-		FOREIGN KEY(test)
-			REFERENCES quan.tests(uuid)
+  "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "quiz" TEXT NOT NULL,
+  "type" INTEGER NOT NULL,
+  "serial" INTEGER NOT NULL DEFAULT 0,
+  "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  CONSTRAINT fk_questions__quiz__quizzes_pk
+    FOREIGN KEY("quiz")
+      REFERENCES quan.quizzes("uuid"),
+  CONSTRAINT fk_questions__type__question_types_pk
+    FOREIGN KEY("type")
+      REFERENCES quan.question_types("id")
 );
 
-CREATE TABLE quan.answers (
-  question TEXT NOT NULL,
-  answer SMALLINT CONSTRAINT answers_index CHECK (index > 0),
-  owner TEXT NOT NULL,
-  CONSTRAINT fk_answers_questions_pk
-		FOREIGN KEY(question)
-			REFERENCES quan.questions(uuid),
-  CONSTRAINT fk_answers_users_pk
-		FOREIGN KEY(owner)
-			REFERENCES quan.users(uuid)
+CREATE TABLE quan.answer_options (
+  "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "question" TEXT NOT NULL,
+  "title" TEXT NOT NULL,
+  "serial" INTEGER NOT NULL DEFAULT 0,
+  CONSTRAINT fk_answer_options__question__questions_pk
+    FOREIGN KEY("question")
+      REFERENCES quan.questions("uuid")
 );
+
+-- relations
+
+CREATE TABLE quan.users_x_quizzes (
+  "user" TEXT NOT NULL,
+  "quiz" TEXT NOT NULL,
+  "start" BIGINT NOT NULL,
+  "finish" BIGINT NOT NULL,
+  CONSTRAINT fk_users_x_quizzes__user__users_pk
+    FOREIGN KEY("user")
+      REFERENCES quan.users("uuid"),
+  CONSTRAINT fk_users_x_quizzes__quiz__quizzes_pk
+    FOREIGN KEY("quiz")
+      REFERENCES quan.quizzes("uuid")
+);
+
+CREATE TABLE quan.users_x_questions (
+  "user" TEXT NOT NULL,
+  "question" TEXT NOT NULL,
+  "answer" TEXT NOT NULL,
+  CONSTRAINT fk_users_x_questions__user__users_pk
+    FOREIGN KEY("user")
+      REFERENCES quan.users("uuid"),
+  CONSTRAINT fk_users_x_questions__question__questions_pk
+    FOREIGN KEY("question")
+      REFERENCES quan.questions("uuid")
+);
+
+-- default
+
+INSERT INTO quan.quiz_types (
+  "id", "textid", "title", "description"
+) VALUES (
+  1, 'time_limited', 'Time limited', 'Quiz with time interval to complete the entire quiz / all questions.'
+), (
+  2, 'strict_time_limited', 'Strict time limited', 'Quiz with time intervals for every question.'
+);
+
+INSERT INTO quan.question_types (
+  "id", "textid", "title", "description"
+) VALUES (
+  -- options are saved in quan.answer_options table
+  1, 'options', 'Options', 'Question with text options'
+);
+
+INSERT INTO users(
+  "uuid", "username", "passhash"
+) VALUES (
+  'root', 'root', ''
+);
+

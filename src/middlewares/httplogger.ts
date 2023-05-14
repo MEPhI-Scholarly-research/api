@@ -1,7 +1,7 @@
 import { Request, NextFunction, Response } from "express";
-import { logger } from "@/app/logger";
+import { logger } from "@/logger";
 
-export const expressLoggerMiddleware = (
+export const loggerMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction

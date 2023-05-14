@@ -1,0 +1,247 @@
+openapi: 3.0.2
+info:
+  description: api v1 for quan 
+  version: 1.0.0
+  title: Quan API
+  contact:
+    name: Kandakov Danil
+servers:
+  - url: http://localhost:3000/api/v1
+tags:
+  - name: Auth
+    description: authentication interface
+  - name: Quiz
+    description: quiz interface
+paths:
+  /register:
+    post:
+      description: craete new user
+      operationId: register
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: user successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  uuid:
+                    type: string
+              example:
+                uuid: uuid
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+
+  /login:
+    patch:
+      description: login user
+      operationId: login
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+            example:
+              username: username
+              password: password
+      responses:
+        '200':
+          description: user successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  access-token:
+                    type: string
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+
+  /quiz:
+    post:
+      description: create new quiz
+      operationId: quiz_post
+      tags:
+        - Quiz
+      parameters:
+        - in: header
+          name: Access-Token
+          schema:
+            type: string
+          description: access-token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                quiz:
+                  $ref: '#/components/schemas/quiz-body' 
+      responses:
+        '200':
+          description: user successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  access-token:
+                    type: string
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+          
+  /quiz/start/{uuid}:
+    get:
+      description: start quiz
+      operationId: quizstart_get
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+          required: true
+          description: uuid of quiz
+        - in: header
+          name: Access-Token
+          schema:
+            type: string
+          required: true
+          description: jwt
+      tags:
+        - Quiz    
+      responses:
+        '200':
+          description: quiz started for this user
+          content:
+            application/json:
+              schema:
+                properties:
+                  quiz:
+                    $ref: '#/components/schemas/quiz-body' 
+                  token:
+                    type: string
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+
+  /quiz/{uuid}:
+    get:
+      description: get quiz
+      operationId: quiz_get
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+          required: true
+          description: uuid of quiz
+        - in: header
+          name: Access-Token
+          schema:
+            type: string
+          required: true
+          description: jwt
+      tags:
+        - Quiz
+      responses:
+        '200':
+          description: user successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  quiz:
+                    $ref: '#/components/schemas/quiz-body-min'
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+
+components:
+  schemas:
+    quiz-body-min:
+      type: object
+      properties:
+        uuid:
+          type: string
+        owner:
+          type: string
+        type:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        time_limit:
+          type: integer
+
+    quiz-body:
+      type: object
+      required: [title,questions,description,type]
+      properties:
+        uuid:
+          type: string
+        owner:
+          type: string
+        type:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        time_limit:
+          type: integer
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/question-body'
+
+    question-body:
+      type: object
+      required: [title,description,type,serial,options]
+      properties:
+        uuid:
+          type: string
+        type:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        serial:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/answer-body'
+    
+    answer-body:
+      type: object
+      required: [title]
+      properties:
+        uuid:
+          type: string
+        title:
+          type: string
+        serial:
+          type: integer

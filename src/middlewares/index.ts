@@ -1,2 +1,2 @@
-export * from "./auth";
-export * from "./logger/httpLogger";
+export { authMiddleware } from "./auth";
+export { loggerMiddleware } from "./httplogger";

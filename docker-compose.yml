@@ -38,29 +38,29 @@ services:
     networks:
       - main_network
 
-  service:
-    build: ./
-    container_name: quan
-    image: quan-img
-    restart: on-failure
-    environment:
-      - POSTGRES_DB=quan_db
-      - POSTGRES_USER=quan
-      - POSTGRES_PASSWORD=Password12345
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - REDIS_PASSWORD=Password12345
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    ports:
-      - '3000:3000'
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - main_network
+  # service:
+  #   build: ./
+  #   container_name: quan
+  #   image: quan-img
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_DB=quan_db
+  #     - POSTGRES_USER=quan
+  #     - POSTGRES_PASSWORD=Password12345
+  #     - POSTGRES_HOST=postgres
+  #     - POSTGRES_PORT=5432
+  #     - REDIS_PASSWORD=Password12345
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - main_network
 
 networks:
   main_network:
