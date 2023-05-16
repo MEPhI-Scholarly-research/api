@@ -38,7 +38,7 @@ export async function quizPost(req: QuizPostRequest, res: Response) {
 
     for (const answer_option of question.options) {
       const result = await client.query(
-        db.Postgres.get("quiz/insert_answer_option")!, 
+        db.Postgres.get("quiz/insert_option")!, 
         [question_uuid, answer_option.title, answer_option.serial])
       let answer_option_uuid = result.rows[0]['uuid']
     }

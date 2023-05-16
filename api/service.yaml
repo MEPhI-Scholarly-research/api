@@ -135,6 +135,8 @@ paths:
             application/json:
               schema:
                 properties:
+                  answers:
+                    $ref: '#/components/schemas/answer-record' 
                   quiz:
                     $ref: '#/components/schemas/quiz-body' 
                   token:
@@ -245,3 +247,15 @@ components:
           type: string
         serial:
           type: integer
+    
+    answer-record:
+      type: object
+      required: [question,answers]
+      properties:
+        question:
+          type: string
+        answers:
+          type: array
+          items:
+            type: string
+      

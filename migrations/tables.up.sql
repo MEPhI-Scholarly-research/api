@@ -66,7 +66,7 @@ CREATE TABLE quan.questions (
       REFERENCES quan.question_types("id")
 );
 
-CREATE TABLE quan.answer_options (
+CREATE TABLE quan.options (
   "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
   "question" TEXT NOT NULL,
   "title" TEXT NOT NULL,
@@ -120,7 +120,7 @@ INSERT INTO quan.question_types (
   1, 'options', 'Options', 'Question with text options'
 );
 
-INSERT INTO users(
+INSERT INTO quan.users(
   "uuid", "username", "passhash"
 ) VALUES (
   'root', 'root', ''

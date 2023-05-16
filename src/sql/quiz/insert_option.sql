@@ -1,4 +1,4 @@
-INSERT INTO quan.answer_options (
+INSERT INTO quan.options (
   "question", "title", "serial"
 ) VALUES (
   $1, $2, $3

@@ -1,5 +1,5 @@
 import express, { Express } from "express"
-import { WebSocket } from 'ws';
+import * as socketio from "socket.io";
 
 import dotenv from "dotenv"
 import cors from "cors"
@@ -12,11 +12,13 @@ import * as db from './db'
 
 dotenv.config();
 
-const httpServer: Express = express();
-const socketServer = new WebSocket.Server({ port: DEFAULT_SOCKET_PORT });
-const server = http.createServer(httpServer);
 const port = process.env.PORT || DEFAULT_PORT;
 const host = process.env.HOST || DEFAULT_HOST;
+
+const httpServer = express();
+httpServer.set("port", port)
+const server = http.createServer(httpServer);
+const socketServer = require("socket.io")(server);
 var bodyParser = require('body-parser')
 
 // apply middlewares
@@ -30,15 +32,15 @@ db.Postgres.set("user/select_user")
 db.Postgres.set("user/insert_token")
 db.Postgres.set("user/select_token")
 
-db.Postgres.set("quiz/insert_answer_option")
+db.Postgres.set("quiz/insert_option")
 db.Postgres.set("quiz/insert_question")
 db.Postgres.set("quiz/insert_quiz")
-db.Postgres.set("quiz/select_answer_options")
+db.Postgres.set("quiz/select_options")
 db.Postgres.set("quiz/select_questions")
 db.Postgres.set("quiz/select_quiz")
 
-db.Postgres.set("quiz/select_questions")
-db.Postgres.set("quiz/select_quiz")
+db.Postgres.set("quiz/start_quiz")
+db.Postgres.set("quiz/finish_quiz")
 
 // init IIFE
 socketIIFE(socketServer);

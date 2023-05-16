@@ -22,6 +22,7 @@ Quiz with time interval to complete the entire quiz / all questions.
       "quiz":"uuid",
       "start":"time",
       "end":"time",
+      "key":"key",
       "answers": [
         {"question":"uuid", "answer":"uuid"}
       ]

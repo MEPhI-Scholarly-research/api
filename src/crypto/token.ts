@@ -2,6 +2,10 @@ import * as db from '../db';
 import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
 
+import { logger } from '@/logger'
+
+import { QuizRecord } from '@/models'
+
 export async function checkAuthJWT(token: string): Promise<string> {
   var temp = token.substring(token.indexOf('.') + 1);
   var bodybase64 = temp.substring(0, temp.indexOf('.'))
@@ -25,21 +29,27 @@ export async function checkAuthJWT(token: string): Promise<string> {
   return jwt.verify(token, salt) ? body.user : ''
 }
 
-export async function checkSessionJWT(token: string): Promise<string> {
+export async function checkSessionJWT(token: string): Promise<[string, QuizRecord]> {
   var temp = token.substring(token.indexOf('.') + 1);
   var bodybase64 = temp.substring(0, temp.indexOf('.'))
   let body = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(bodybase64)))
 
-  let salt: string
+  let record: QuizRecord = new QuizRecord()
 
-  let client = db.Redis.client();
-  await client.connect();
+  let redis_client = db.Redis.client();
+  await redis_client.connect();
   try {
-    salt = await client.get('session_'+body.uuid) as string;
+    let dataStr = await redis_client.get('quiz_session_'+body['session-uuid'])
+    if (dataStr == undefined) {
+      logger.debug('cannot find session record in redis')
+      return ['', record]
+    }
+    record = JSON.parse(dataStr as string)
   } catch(e) {
-    return ''
+    logger.debug('redis request error')
+    return ['', record]
   }
-  await client.disconnect()
+  await redis_client.disconnect()
 
-  return jwt.verify(token, salt) ? body.user : ''
+  return jwt.verify(token, record.key) ? [body['session-uuid'], record] : ['', record]
 }

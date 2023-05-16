@@ -1,3 +1,3 @@
 SELECT "uuid", "question", "title", "serial"
-FROM quan.answer_options
+FROM quan.options
 WHERE "question"=$1
