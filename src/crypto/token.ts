@@ -30,6 +30,7 @@ export async function checkAuthJWT(token: string): Promise<string> {
 }
 
 export async function checkSessionJWT(token: string): Promise<[string, QuizRecord]> {
+  // get jwt payload
   var temp = token.substring(token.indexOf('.') + 1);
   var bodybase64 = temp.substring(0, temp.indexOf('.'))
   let body = JSON.parse(CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(bodybase64)))

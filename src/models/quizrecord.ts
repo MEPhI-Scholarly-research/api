@@ -15,14 +15,14 @@ export class QuizAnswer {
 export class QuizRecord {
   quiz: string
   start: number
-  end: number
+  time_limit: number
   key: string
   answers: QuizAnswer[]
 
   constructor() {
     this.quiz = ''
     this.start = 0
-    this.end = 0
+    this.time_limit = 0
     this.key = ''
     this.answers = []
   }

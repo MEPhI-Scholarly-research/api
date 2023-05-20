@@ -100,7 +100,7 @@ export async function quizStartGet(req: Request, res: Response) {
 
     quizRecord.quiz = quiz_uuid;
     quizRecord.start = Date.now();
-    quizRecord.end = Date.now() + quiz.time_limit;
+    quizRecord.time_limit = quiz.time_limit;
     quizRecord.answers = [];
 
     // insert in postgres that session was started

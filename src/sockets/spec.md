@@ -43,6 +43,10 @@ Quiz with time interval to complete the entire quiz / all questions.
       ```json
       {"type":"answer", "question":"uuid", "answer":"uuid"}
       ```
+      - Delete-Answer-Message. Server delete answer from answers array. Message body:
+       ```json
+      {"type":"delete-answer", "question":"uuid", "answer":"uuid"}
+      ```
       - Finish-Message. Server saves all in <b>persistent data storage</b> and remove data from <b>redis</b>.
       ```json
       {"type":"finish", "token":"jwt"}
