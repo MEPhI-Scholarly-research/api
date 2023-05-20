@@ -99,6 +99,7 @@ export async function quizStartGet(req: Request, res: Response) {
     await redis_client.set(quiz_x_user_redis_key, session_uuid);
 
     quizRecord.quiz = quiz_uuid;
+    quizRecord.user = user_uuid;
     quizRecord.start = Date.now();
     quizRecord.time_limit = quiz.time_limit;
     quizRecord.answers = [];

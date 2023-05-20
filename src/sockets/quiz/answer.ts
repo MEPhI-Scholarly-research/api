@@ -5,6 +5,7 @@ import { QuizRecord, QuizAnswer } from '@/models'
 
 export async function answerEvent(session_uuid: string, record: QuizRecord, question: string, answer: string): Promise<QuizRecord> {
   let found_question: boolean = false
+
   for (let i=0; i<record.answers.length; i++) {
     if (record.answers[i].question == question) {
       found_question = true

@@ -7,10 +7,11 @@ import { connectionEvent } from './connection'
 import { timeEventSender } from './time'
 import { deleteAnswerEvent } from './deleteanswer'
 import { answerEvent } from './answer'
+import { finishEvent } from './finish'
 
 export async function quizProcess(socket: any) {
   let session_uuid: string
-  let record: QuizRecord
+  let record: QuizRecord = new QuizRecord
 
   logger.debug('A new WebSocket connection was established');
 
@@ -20,19 +21,18 @@ export async function quizProcess(socket: any) {
       [session_uuid, record] = await connectionEvent(body['token'])
       if (session_uuid != '')
         timeEventSender(socket, record.start, record.time_limit)
-      logger.debug('quiz_session_'+session_uuid)
     } else if (body['type'] == "answer") {
       record = await answerEvent(session_uuid, record, body['question'], body['answer'])
     } else if (body['type'] == "delete-answer") {
       record = await deleteAnswerEvent(session_uuid, record, body['question'], body['answer'])
     } else if (body['type'] == "finish") {
-      
+      await finishEvent(body['token'])
     } else {
-      console.log('New message')
+      logger.debug('Undefined message type')
     }
   });
 
   socket.on('close', () => {
-    console.log(`Web-Socket connection with uuid '${session_uuid}' closed`);
+    logger.debug(`Web-Socket connection with uuid '${session_uuid}' closed`);
   });
 }
