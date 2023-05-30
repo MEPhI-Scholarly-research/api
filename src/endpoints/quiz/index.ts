@@ -1,3 +1,5 @@
-export { quizStartGet } from "./quizstart.get"
+export { quizStartUuidGet } from "./quizstartuuid.get"
 export { quizPost } from "./quiz.post";
-export { quizGet } from "./quiz.get";
+export { quizUuidGet } from "./quizuuid.get";
+export { quizUuidResultsGet } from "./quizuuidresults.get";
+export { quizSessionUuidGet } from "./quizsessionuuid.get";

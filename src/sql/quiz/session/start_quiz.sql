@@ -3,3 +3,4 @@ INSERT INTO quan.users_x_quizzes (
 ) VALUES (
   $1, $2, $3, $3
 )
+RETURNING "uuid"

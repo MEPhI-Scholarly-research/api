@@ -1,1 +1,1 @@
-INSERT INTO quan.users ("username", "passhash") VALUES ($1, $2) RETURNING "uuid"
+INSERT INTO quan.users ("username", "displayname", "passhash") VALUES ($1, $2, $3) RETURNING "uuid"

@@ -1,2 +1,2 @@
 export { registerPost } from "./register.post";
-export { loginPatch } from "./login.patch";
+export { loginPost } from "./login.post";

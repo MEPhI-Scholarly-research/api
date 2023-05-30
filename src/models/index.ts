@@ -1,5 +1,5 @@
-export { Option } from "./option"
-export { Question } from "./question";
-export { Quiz } from "./quiz";
+export { Quiz, QuizMin, Question, Option } from "./quiz";
 
 export { QuizRecord, QuizAnswer } from "./quizrecord";
+
+export { QuizSession, QuizSessions } from "./quizsession"

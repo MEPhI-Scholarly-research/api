@@ -8,6 +8,7 @@ import * as CryptoJS from 'crypto-js';
 
 interface User extends Request {
   body: {
+    displayname: string
     username: string
     password: string
   }
@@ -28,7 +29,7 @@ export async function registerPost(req: User, res: Response) {
   await client.connect();
   try {
     const result = await client.query(db.Postgres.get("user/insert_user")!, 
-      [body.username, iterations.toString() + ':' + salt + ':' + passhash]);
+      [body.username, body.displayname, iterations.toString() + ':' + salt + ':' + passhash]);
     uuid = result.rows[0]['uuid']
   } catch(e) {
     return res.status(400).json({});

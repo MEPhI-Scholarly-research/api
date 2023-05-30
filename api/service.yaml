@@ -26,6 +26,8 @@ paths:
               properties:
                 username:
                   type: string
+                displayname:
+                  type: string
                 password:
                   type: string
       responses:
@@ -45,7 +47,7 @@ paths:
           description: internal server error
 
   /login:
-    patch:
+    post:
       description: login user
       operationId: login
       tags:
@@ -64,11 +66,13 @@ paths:
               password: password
       responses:
         '200':
-          description: user successfully created
+          description: user successfully logined
           content:
             application/json:
               schema:
                 properties:
+                  displayname:
+                    type: string
                   access-token:
                     type: string
         '400':
@@ -94,10 +98,10 @@ paths:
             schema:
               properties:
                 quiz:
-                  $ref: '#/components/schemas/quiz-body' 
+                  $ref: '#/components/schemas/quiz-body-create' 
       responses:
         '200':
-          description: user successfully created
+          description: quiz created
           content:
             application/json:
               schema:
@@ -130,7 +134,7 @@ paths:
         - Quiz    
       responses:
         '200':
-          description: quiz started for this user
+          description: quiz started
           content:
             application/json:
               schema:
@@ -167,7 +171,7 @@ paths:
         - Quiz
       responses:
         '200':
-          description: user successfully created
+          description: found quiz
           content:
             application/json:
               schema:
@@ -178,6 +182,51 @@ paths:
           description: wrong fields format
         '500':
           description: internal server error
+
+  /quiz/results/{uuid}:
+    get:
+      description: get quiz results
+      operationId: quiz_results_get
+      tags:
+        - Quiz
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+        required: true
+        description: quiz uuid
+      - in: header
+        name: Access-Token
+        schema:
+          type: string
+        required: true
+        description: jwt
+      - in: query
+        name: session
+        schema:
+          type: string
+        description: user
+      responses:
+        '200':
+          description: found results
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/quiz-result-body'
+                - type: object
+                  properties:
+                    results:
+                      $ref: '#/components/schemas/quiz-results-body'
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+
 
 components:
   schemas:
@@ -196,6 +245,23 @@ components:
           type: string
         time_limit:
           type: integer
+
+    quiz-body-create:
+      type: object
+      required: [title,questions,description,type]
+      properties:
+        type:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        time_limit:
+          type: integer
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/question-body-create'
 
     quiz-body:
       type: object
@@ -218,6 +284,25 @@ components:
           items:
             $ref: '#/components/schemas/question-body'
 
+    question-body-create:
+      type: object
+      required: [title,description,type,serial,options]
+      properties:
+        type:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        serial:
+          type: integer
+        weight:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/option-body-create'
+
     question-body:
       type: object
       required: [title,description,type,serial,options]
@@ -235,9 +320,20 @@ components:
         options:
           type: array
           items:
-            $ref: '#/components/schemas/answer-body'
+            $ref: '#/components/schemas/option-body'
     
-    answer-body:
+    option-body-create:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        serial:
+          type: integer
+        is_correct:
+          type: boolean
+
+    option-body:
       type: object
       required: [title]
       properties:
@@ -258,4 +354,43 @@ components:
           type: array
           items:
             type: string
-      
+    
+    quiz-result-body-min:
+      type: object
+      properties:
+        user:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
+        result:
+          type: number
+    
+    quiz-result-body:
+      type: object
+      properties:
+        quiz:
+          type: string
+        user:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
+        result:
+          type: number
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              question:
+                $ref: '#/components/schemas/question-body'
+              answer:
+                type: string
+
+    quiz-results-body:
+      type: array
+      items:
+          $ref: '#/components/schemas/quiz-result-body-min'

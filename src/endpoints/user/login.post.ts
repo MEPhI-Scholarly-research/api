@@ -21,12 +21,13 @@ interface PasswordMeta {
   hash: string
 }
 
-export async function loginPatch(req: User, res: Response) {
+export async function loginPost(req: User, res: Response) {
   var body = req.body ?? null;
   if (body == null)
     return res.status(400).json({});
 
   let user: string
+  let displayname: string
   let pm: PasswordMeta = {iterations: 0,salt:'',hash:''}
 
   // get user data from postgres
@@ -39,6 +40,7 @@ export async function loginPatch(req: User, res: Response) {
       return res.status(400).json({});
       user = result.rows[0]['uuid']
     var passhash = result.rows[0]['passhash']
+    displayname = result.rows[0]['displayname']
     pm.iterations = +passhash.substring(0,passhash.indexOf(':'))
     passhash = passhash.substring(passhash.indexOf(':')+1)
     pm.salt = passhash.substring(0,passhash.indexOf(':'))
@@ -69,6 +71,7 @@ export async function loginPatch(req: User, res: Response) {
 
   let token = jwt.sign({"uuid": token_uuid, "user": user}, secret_key);
   res.status(200).json({
-    token: token
+    "access-token": token,
+    displayname: displayname
   });
 }

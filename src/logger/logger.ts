@@ -8,7 +8,6 @@ const customConfig = {
   debug: "rainbow",
 };
 
-// задаем явно тип логгера, потому что для него нет типов
 type Logger = {
   info: (message: string) => void;
   error: (message: string) => void;

@@ -1,1 +1,1 @@
-SELECT "uuid", "passhash" FROM quan.users WHERE "username"=$1
+SELECT "uuid", "displayname", "passhash" FROM quan.users WHERE "username"=$1

@@ -1,0 +1,47 @@
+{
+  "login": {
+    "access-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZWEyZTRkMDAtN2NlMy00MjNhLWFiZjYtNTU0M2RjMGU5N2M3IiwidXNlciI6IjAyNDY2NjI4LTM4MGUtNDEyMS1iOGY0LTAwOWVhMzMxZjA1OCIsImlhdCI6MTY4NDk1MjM3Mn0.pEHVIh_EMH69jQFYtq6yW22AnbkdRd7KsBSq8hG8PXA",
+    "displayname": "displayname"
+  },
+  "quiz post": {
+    "quiz": "d1b416d9-0350-4446-9b38-e4ca93e28b18"
+  },
+  "quiz start": {
+    "quiz": {
+      "uuid": "d1b416d9-0350-4446-9b38-e4ca93e28b18",
+      "owner": "02466628-380e-4121-b8f4-009ea331f058",
+      "type": 1,
+      "title": "string",
+      "description": "string",
+      "time_limit": 1000000,
+      "questions": [
+        {
+          "uuid": "ea28f835-1fc0-4928-900c-775ac87db4d0",
+          "type": 1,
+          "title": "string",
+          "description": "string",
+          "serial": 0,
+          "weight": 1,
+          "options": [
+            {
+              "uuid": "f102e0a5-658c-4412-97aa-0dbf99a21576",
+              "title": "string",
+              "serial": 0,
+              "weight": 1,
+              "is_correct": true
+            },
+            {
+              "uuid": "9e9561c8-260e-4f7d-9d36-2c3ca317254d",
+              "title": "string",
+              "serial": 1,
+              "weight": 1,
+              "is_correct": false
+            }
+          ]
+        }
+      ]
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uLXV1aWQiOiJlNjhlMjA1ZS1kZDU5LTQzMzEtOTZiOS1iZWI4ZDNhYjAwZDUiLCJ1c2VyLXV1aWQiOiIwMjQ2NjYyOC0zODBlLTQxMjEtYjhmNC0wMDllYTMzMWYwNTgiLCJpYXQiOjE2ODQ5NTIzNzJ9.ZypIk9jIMMDXSsnzKWCdNpW2LY0rXjDPNXL_fMp02fo",
+    "answers": []
+  }
+}
