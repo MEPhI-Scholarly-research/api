@@ -43,8 +43,6 @@ db.Postgres.set("quiz/session/finish_quiz");
 db.Postgres.set("quiz/session/select_session");
 db.Postgres.set("quiz/session/select_answers");
 db.Postgres.set("quiz/session/select_quiz_sessions");
-db.Postgres.set("quiz/start_quiz");
-db.Postgres.set("quiz/finish_quiz");
 
 // init IIFE
 socketIIFE(server);
