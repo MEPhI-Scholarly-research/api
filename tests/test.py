@@ -66,7 +66,7 @@ def answer_process(user, quiz_uuid):
   print("\"quiz start\":", resData)
   sessionToken = str(resData['token'])
   
-  sio.connect('http://localhost:3000')
+  sio.connect('http://localhost:3001')
   sio.emit('message', data='{"type":"connection", "token":"'+sessionToken+'"}')
   time.sleep(1)
   question = resData['quiz']['questions'][0]['uuid']

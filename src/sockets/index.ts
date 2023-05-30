@@ -1,7 +1,29 @@
-import { quizProcess } from '@/sockets/quiz'
+import { quizProcess } from "@/sockets/quiz";
+import { Server } from "socket.io";
+import type { Server as HttpServer } from "http";
+import { logger } from "@/logger";
+import { DEFAULT_SOCKET_PORT } from "@/constants";
 
-function socketIIFE(socket: any) {
-  socket.on('connection', quizProcess);
+function socketIIFE(server: HttpServer) {
+  const io = new Server(server, {
+    serveClient: false,
+    cors: {
+      origin: "*",
+      credentials: false,
+    },
+  });
+
+  io.on("connection", (socket) => {
+    logger.info(`SOCKET CONNECTED: ${socket.id}`);
+
+    quizProcess(socket);
+
+    socket.on("disconnect", () => {
+      logger.info(`SOCKETS DISCONNECTED: ${socket.id}`);
+    });
+  });
+
+  io.listen(DEFAULT_SOCKET_PORT);
 }
 
-export default socketIIFE
+export default socketIIFE;

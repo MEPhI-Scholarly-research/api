@@ -8,7 +8,7 @@ import http from "http";
 import { DEFAULT_PORT, DEFAULT_HOST, DEFAULT_SOCKET_PORT } from "./constants";
 import socketIIFE from "./sockets";
 import routesIIFE from "./endpoints";
-import * as db from './db';
+import * as db from "./db";
 
 dotenv.config();
 
@@ -18,8 +18,7 @@ const host = process.env.HOST || DEFAULT_HOST;
 const httpServer = express();
 httpServer.set("port", port);
 const server = http.createServer(httpServer);
-const socketServer = require("socket.io")(server);
-var bodyParser = require('body-parser');
+var bodyParser = require("body-parser");
 
 // apply middlewares
 httpServer.use(cors());
@@ -44,12 +43,14 @@ db.Postgres.set("quiz/session/finish_quiz");
 db.Postgres.set("quiz/session/select_session");
 db.Postgres.set("quiz/session/select_answers");
 db.Postgres.set("quiz/session/select_quiz_sessions");
+db.Postgres.set("quiz/start_quiz");
+db.Postgres.set("quiz/finish_quiz");
 
 // init IIFE
-socketIIFE(socketServer);
+socketIIFE(server);
 routesIIFE(httpServer);
 
-process.on('uncaughtException', (error: Error) => {
+process.on("uncaughtException", (error: Error) => {
   console.log(`Uncaught Exception: ${error.message}`);
 });
 
