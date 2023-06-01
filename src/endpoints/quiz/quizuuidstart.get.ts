@@ -9,7 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import {v4 as uuidv4} from 'uuid';
 import * as CryptoJS from 'crypto-js';
 
-export async function quizStartUuidGet(req: Request, res: Response) {
+export async function quizUuidStartGet(req: Request, res: Response) {
   // get params from request
   let user_uuid = req.header("user");
   if (user_uuid == undefined)
@@ -71,6 +71,7 @@ export async function quizStartUuidGet(req: Request, res: Response) {
   // create response
   let token = jwt.sign({ "session-uuid": session_uuid, "user-uuid": user_uuid }, key);
   res.status(200).json({
+    session: session_uuid,
     quiz: quiz,
     token: token,
     answers: quizRecord.answers,

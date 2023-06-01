@@ -92,7 +92,7 @@ CREATE TABLE quan.options (
 
 -- relations
 
--- session
+-- sessions
 CREATE TABLE quan.users_x_quizzes (
   "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
 

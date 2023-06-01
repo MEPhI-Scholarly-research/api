@@ -19,6 +19,26 @@ class PostgersDB {
       password: process.env.POSTGRES_PASSWORD ?? '',
       database: process.env.POSTGRES_DB ?? 'postgres',
     }
+
+    this.set("user/insert_user");
+    this.set("user/select_user");
+    this.set("user/insert_token");
+    this.set("user/select_token");
+
+    this.set("quiz/insert_option");
+    this.set("quiz/insert_question");
+    this.set("quiz/insert_quiz");
+    this.set("quiz/select_options");
+    this.set("quiz/select_questions");
+    this.set("quiz/select_quiz");
+
+    this.set("quiz/session/start_quiz");
+    this.set("quiz/session/finish_quiz");
+    this.set("quiz/session/select_session");
+    this.set("quiz/session/select_answers");
+    this.set("quiz/session/select_quiz_sessions");
+
+    this.set("quiz/select_user_quizzes");
   }
 
   set(request_name: string) {

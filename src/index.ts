@@ -25,25 +25,6 @@ httpServer.use(cors());
 httpServer.use(bodyParser.urlencoded({ extended: false }));
 httpServer.use(bodyParser.json());
 
-// init databases
-db.Postgres.set("user/insert_user");
-db.Postgres.set("user/select_user");
-db.Postgres.set("user/insert_token");
-db.Postgres.set("user/select_token");
-
-db.Postgres.set("quiz/insert_option");
-db.Postgres.set("quiz/insert_question");
-db.Postgres.set("quiz/insert_quiz");
-db.Postgres.set("quiz/select_options");
-db.Postgres.set("quiz/select_questions");
-db.Postgres.set("quiz/select_quiz");
-
-db.Postgres.set("quiz/session/start_quiz");
-db.Postgres.set("quiz/session/finish_quiz");
-db.Postgres.set("quiz/session/select_session");
-db.Postgres.set("quiz/session/select_answers");
-db.Postgres.set("quiz/session/select_quiz_sessions");
-
 // init IIFE
 socketIIFE(server);
 routesIIFE(httpServer);

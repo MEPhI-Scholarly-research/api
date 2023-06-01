@@ -12,7 +12,38 @@ tags:
     description: authentication interface
   - name: Quiz
     description: quiz interface
+  - name: User
+    description: user interface
 paths:
+  /quizzes:
+    get:
+      description: start quiz
+      operationId: quizzes_get
+      parameters:
+        - in: header
+          name: Access-Token
+          schema:
+            type: string
+          required: true
+          description: jwt
+      tags:
+        - Quiz    
+      responses:
+        '200':
+          description: quiz started
+          content:
+            application/json:
+              schema:
+                properties:
+                  quizzes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/quiz-body-min' 
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
+          
   /register:
     post:
       description: craete new user
@@ -114,7 +145,7 @@ paths:
           description: internal server error
           
   /quiz/start/{uuid}:
-    get:
+    patch:
       description: start quiz
       operationId: quizstart_get
       parameters:
@@ -140,7 +171,16 @@ paths:
               schema:
                 properties:
                   answers:
-                    $ref: '#/components/schemas/answer-record' 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                        answers:
+                          type: array
+                          items:
+                            type: string
                   quiz:
                     $ref: '#/components/schemas/quiz-body' 
                   token:
@@ -183,12 +223,12 @@ paths:
         '500':
           description: internal server error
 
-  /quiz/results/{uuid}:
+  /quiz/{uuid}/sessions:
     get:
       description: get quiz results
-      operationId: quiz_results_get
+      operationId: quiz_uuid_results_get
       tags:
-        - Quiz
+        - User
       parameters:
       - in: path
         name: uuid
@@ -213,20 +253,49 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/quiz-result-body'
-                - type: object
-                  properties:
-                    results:
-                      $ref: '#/components/schemas/quiz-results-body'
+                $ref: '#/components/schemas/quiz-sessions-body'
         '400':
           description: wrong fields format
         '500':
           description: internal server error
-
+  
+  /quiz/session/{uuid}:
+    get:
+      description: get session (quiz x user)
+      operationId: quiz_session_uuid_get
+      tags:
+        - User
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+        required: true
+        description: session uuid
+      - in: header
+        name: Access-Token
+        schema:
+          type: string
+        required: true
+        description: jwt
+      - in: query
+        name: session
+        schema:
+          type: string
+        description: user
+      responses:
+        '200':
+          description: found results
+          content:
+            application/json:
+              schema:
+                properties:
+                  session: 
+                    $ref: '#/components/schemas/quiz-session-body'
+        '400':
+          description: wrong fields format
+        '500':
+          description: internal server error
 
 components:
   schemas:
@@ -344,53 +413,76 @@ components:
         serial:
           type: integer
     
-    answer-record:
-      type: object
-      required: [question,answers]
-      properties:
-        question:
-          type: string
-        answers:
-          type: array
-          items:
-            type: string
-    
-    quiz-result-body-min:
+    question-with-selected-answers-body:
       type: object
       properties:
-        user:
+        uuid:
           type: string
-        start:
+        type:
           type: integer
-        end:
-          type: integer
-        result:
-          type: number
-    
-    quiz-result-body:
-      type: object
-      properties:
-        quiz:
+        title:
           type: string
-        user:
+        description:
           type: string
-        start:
+        serial:
           type: integer
-        end:
-          type: integer
-        result:
-          type: number
-        answers:
+        options:
           type: array
           items:
             type: object
             properties:
-              question:
-                $ref: '#/components/schemas/question-body'
-              answer:
+              uuid:
                 type: string
-
-    quiz-results-body:
-      type: array
-      items:
-          $ref: '#/components/schemas/quiz-result-body-min'
+              title:
+                type: string
+              serial:
+                type: integer
+              is_correct:
+                type: boolean
+              selected:
+                type: boolean
+    
+    quiz-session-body:
+      type: object
+      properties:
+        uuid:
+          type: string
+        user:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
+        score:
+          type: integer
+        quiz:
+          type: object
+          properties:
+            questions:
+              type: array
+              items:
+                $ref: '#/components/schemas/question-with-selected-answers-body'
+    
+    quiz-session-body-min:
+      type: object
+      properties:
+        uuid:
+          type: string
+        user:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
+        score:
+          type: integer
+    
+    quiz-sessions-body:
+      type: object
+      properties:
+        quiz:
+          $ref: '#/components/schemas/quiz-session-body-min'
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/quiz-body-min'

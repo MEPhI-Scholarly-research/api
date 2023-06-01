@@ -1,8 +1,8 @@
--- $1 - quiz uuid, $2 - limit, $3 - offset
+-- $1 - user uuid, $2 - limit, $3 - offset
 WITH ordered_sessions AS (
   SELECT "uuid", ROW_NUMBER() OVER (ORDER BY "created" DESC) AS "id"
   FROM quan.users_x_quizzes
-  WHERE "quiz" = $1
+  WHERE "user" = $1
 )
 SELECT "uuid"
 FROM ordered_sessions

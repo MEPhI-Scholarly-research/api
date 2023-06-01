@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 
 
 
-export async function quizUuidResultsGet(req: Request, res: Response) {
+export async function quizUuidSessionsGet(req: Request, res: Response) {
   let sessions: QuizSessions | undefined = new QuizSessions
 
   let limit: number = +(req.query.limit as string)

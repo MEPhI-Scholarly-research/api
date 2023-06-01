@@ -60,7 +60,7 @@ def answer_process(user, quiz_uuid):
   print("\"login\":", resData, ",")
   accessToken = str(resData['access-token'])
 
-  response = requests.get('http://localhost:3000/api/v1/quiz/start/'+quiz_uuid, headers={'Access-Token':accessToken})
+  response = requests.patch('http://localhost:3000/api/v1/quiz/'+quiz_uuid +'/start', headers={'Access-Token':accessToken})
   assert(response.status_code == 200)
   resData = response.json()
   print("\"quiz start\":", resData)
