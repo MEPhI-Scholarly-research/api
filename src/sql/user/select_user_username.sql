@@ -1,0 +1,1 @@
+SELECT "uuid", "username", "displayname", "passhash" FROM quan.users WHERE "username"=$1

@@ -1,4 +1,4 @@
-import * as db from '@/db';
+import * as db from '@/database';
 import * as crypto from '@/crypto';
 import { JWT_KEY_SIZE } from "@/constants"
 
@@ -34,7 +34,7 @@ export async function loginPost(req: User, res: Response) {
   let client = db.Postgres.client();
   await client.connect();
   try {
-    const result = await client.query( db.Postgres.get("user/select_user")!, 
+    const result = await client.query( db.Postgres.get("user/select_user_username")!, 
       [body.username]);
     if (result.rowCount == 0)
       return res.status(400).json({});

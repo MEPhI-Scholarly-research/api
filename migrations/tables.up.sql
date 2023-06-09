@@ -139,5 +139,5 @@ INSERT INTO quan.question_types (
   "id", "textid", "title", "description"
 ) VALUES (
   -- options are saved in quan.answer_options table
-  1, 'options', 'Options', 'Question with text options'
+  1, 'text_options', 'Text Options', 'Question with text options'
 );

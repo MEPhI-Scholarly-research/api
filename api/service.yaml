@@ -144,7 +144,7 @@ paths:
         '500':
           description: internal server error
           
-  /quiz/start/{uuid}:
+  /quiz/{uuid}/start:
     patch:
       description: start quiz
       operationId: quizstart_get
@@ -170,19 +170,8 @@ paths:
             application/json:
               schema:
                 properties:
-                  answers:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        question:
-                          type: string
-                        answers:
-                          type: array
-                          items:
-                            type: string
-                  quiz:
-                    $ref: '#/components/schemas/quiz-body' 
+                  session:
+                    $ref: '#/components/schemas/quiz-session-body' 
                   token:
                     type: string
         '400':
@@ -412,35 +401,10 @@ components:
           type: string
         serial:
           type: integer
-    
-    question-with-selected-answers-body:
-      type: object
-      properties:
-        uuid:
-          type: string
-        type:
-          type: integer
-        title:
-          type: string
-        description:
-          type: string
-        serial:
-          type: integer
-        options:
-          type: array
-          items:
-            type: object
-            properties:
-              uuid:
-                type: string
-              title:
-                type: string
-              serial:
-                type: integer
-              is_correct:
-                type: boolean
-              selected:
-                type: boolean
+        is_selected:
+          type: boolean
+        is_correct:
+          type: boolean
     
     quiz-session-body:
       type: object
@@ -456,12 +420,7 @@ components:
         score:
           type: integer
         quiz:
-          type: object
-          properties:
-            questions:
-              type: array
-              items:
-                $ref: '#/components/schemas/question-with-selected-answers-body'
+          $ref: '#/components/schemas/quiz-body'
     
     quiz-session-body-min:
       type: object

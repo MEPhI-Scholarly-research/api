@@ -1,5 +1,4 @@
 import express, { Express } from "express";
-import * as socketio from "socket.io";
 
 import dotenv from "dotenv";
 import cors from "cors";
@@ -8,31 +7,49 @@ import http from "http";
 import { DEFAULT_PORT, DEFAULT_HOST, DEFAULT_SOCKET_PORT } from "./constants";
 import socketIIFE from "./sockets";
 import routesIIFE from "./endpoints";
-import * as db from "./db";
 
-dotenv.config();
+import * as test from "../tests/unit"
 
-const port = process.env.PORT || DEFAULT_PORT;
-const host = process.env.HOST || DEFAULT_HOST;
+function tests() {
+  test.quizModelSelect("a38c2685-a97e-4b5e-842f-46aeabf27fc8");
+  test.sessionModelSelect("ed3b71b6-490c-4887-b377-0d398fdd3d78");
+}
 
-const httpServer = express();
-httpServer.set("port", port);
-const server = http.createServer(httpServer);
-var bodyParser = require("body-parser");
+function start() {
+  dotenv.config();
 
-// apply middlewares
-httpServer.use(cors());
-httpServer.use(bodyParser.urlencoded({ extended: false }));
-httpServer.use(bodyParser.json());
+  const port = process.env.PORT || DEFAULT_PORT;
+  const host = process.env.HOST || DEFAULT_HOST;
 
-// init IIFE
-socketIIFE(server);
-routesIIFE(httpServer);
+  const httpServer = express();
+  httpServer.set("port", port);
+  const server = http.createServer(httpServer);
+  var bodyParser = require("body-parser");
 
-process.on("uncaughtException", (error: Error) => {
-  console.log(`Uncaught Exception: ${error.message}`);
-});
+  // apply middlewares
+  httpServer.use(cors());
+  httpServer.use(bodyParser.urlencoded({ extended: false }));
+  httpServer.use(bodyParser.json());
 
-server.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://${host}:${port}`);
-});
+  // init IIFE
+  socketIIFE(server);
+  routesIIFE(httpServer);
+
+  process.on("uncaughtException", (error: Error) => {
+    console.log(`Uncaught Exception: ${error.message}`);
+  });
+
+  server.listen(port, () => {
+    console.log(`⚡️[server]: Server is running at http://${host}:${port}`);
+  });
+}
+
+let argvs = process.argv.slice(2)
+if (argvs.length > 0) {
+  if (argvs[0] == "tests")
+    tests();
+  else
+    start();
+} else {
+  start();
+}

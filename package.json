@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p .",
-    "start": "npx nodemon",
-    "start:production": "node ./dist/index.js"
+    "debug": "npx nodemon",
+    "start": "node ./dist/src/index.js start",
+    "tests": "node ./dist/src/index.js tests"
   },
   "keywords": [],
   "author": "",

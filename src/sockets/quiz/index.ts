@@ -1,5 +1,4 @@
-import * as socketio from "socket.io";
-import { QuizRecord, QuizAnswer } from "@/models";
+import { QuizRecord } from "@/models";
 
 import { logger } from "@/logger";
 
@@ -13,7 +12,7 @@ export async function quizProcess(socket: any) {
   let session_uuid: string;
   let record: QuizRecord = new QuizRecord();
 
-  logger.debug("A new WebSocket connection was established");
+  logger.info("A new WebSocket connection was established");
 
   socket.on("message", async (message: string) => {
     const body = JSON.parse(message);

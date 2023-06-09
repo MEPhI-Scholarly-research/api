@@ -1,4 +1,4 @@
-import * as db from "@/db";
+import * as db from "@/database";
 import { logger } from "@/logger";
 import { checkSessionJWT } from "@/crypto";
 import { QuizRecord } from "@/models";

@@ -13,19 +13,14 @@ export class QuizAnswer {
 }
 
 export class QuizRecord {
-  quiz: string
-  user: string
-  start: number
-  time_limit: number
-  key: string
-  answers: QuizAnswer[]
+  quiz: string = '';
+  user: string = '';
+  start: number = 0;
+  time_limit: number = 0;
+  key: string = "";
+  answers: QuizAnswer[] = [];
 
-  constructor() {
-    this.quiz = ''
-    this.user = ''
-    this.start = 0
-    this.time_limit = 0
-    this.key = ''
-    this.answers = []
+  public constructor(init?:Partial<QuizRecord>) {
+    Object.assign(this, init);
   }
 }

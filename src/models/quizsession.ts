@@ -1,141 +1,34 @@
-import { Question } from './quiz';
-import { Quiz, QuizMin } from './quiz';
+import { Quiz } from './quiz';
+import { QuizMin } from './quizmin';
+import { QuestionWithOptions } from './question/questionwithoptions';
 
-import { Client } from 'pg';
-import * as db from '@/db';
+import * as db from '@/database';
 import { logger } from '@/logger';
-
-class SelectedOption {
-  uuid: string;
-  title: string;
-  serial: number;
-  is_correct: boolean;
-  selected: boolean;
-
-  constructor() {
-    this.uuid = '';
-    this.title = '';
-    this.serial = 0;
-    this.is_correct = false;
-    this.selected = false;
-  }
-}
-
-class QuestionWithSelectedOptions {
-  uuid: string;
-  type: number;
-  title: string;
-  description: string;
-  serial: number;
-  options: SelectedOption[];
-
-  constructor() {
-    this.uuid = '';
-    this.type = 0;
-    this.title = '';
-    this.description = '';
-    this.serial = 0;
-    this.options = [];
-  }
-
-  async selectOptions(db_client: Client, question_uuid: string): Promise<QuestionWithSelectedOptions | undefined> {
-    let result_options = await db_client.query(db.Postgres.get('quiz/select_options')!, [question_uuid])
-    if (result_options.rows[0] == undefined) {
-      logger.debug('undefined result_options');
-      return undefined;
-    }
-
-    for (const row_option of result_options.rows) {
-      let option: SelectedOption = new SelectedOption()
-
-      option.uuid = row_option['uuid']
-      option.title = row_option['title']
-      option.serial = row_option['serial']
-      option.is_correct = row_option['is_correct']
-
-      this.options.push(option)
-    }
-
-    return this;
-  }
-}
-
-class QuizWithSelectedOptions extends QuizMin {
-  questions: QuestionWithSelectedOptions[];
-  constructor() {
-    super();
-    this.questions = [];
-  }
-
-  async select(db_client: Client, quiz_uuid: string): Promise<QuizWithSelectedOptions | undefined> {
-    // select quiz meta
-    let result_quiz = await db_client.query(db.Postgres.get('quiz/select_quiz')!, [quiz_uuid])
-    if (result_quiz.rows[0] == undefined) {
-      logger.debug('undefined result_quiz');
-      return undefined;
-    }
-    var row_quiz = result_quiz.rows[0]
-
-    this.uuid = quiz_uuid
-    this.owner = row_quiz['owner']
-    this.type = row_quiz['type']
-    this.title = row_quiz['title']
-    this.description = row_quiz['description']
-    this.time_limit = row_quiz['time_limit']
-
-    // select quiz questions
-    let result_questions = await db_client.query(db.Postgres.get('quiz/select_questions')!, [quiz_uuid])
-    if (result_questions.rows[0] == undefined) {
-      logger.debug('undefined result_questions');
-      return undefined;
-    }
-
-    for (const row_question of result_questions.rows) {
-      let question: QuestionWithSelectedOptions | undefined = new QuestionWithSelectedOptions()
-      
-      question.uuid = row_question['uuid']
-      question.type = row_question['type']
-      question.title = row_question['title']
-      question.description = row_question['description']
-      question.serial = row_question['serial']
-
-      question = await question.selectOptions(db_client, question.uuid)
-      if (question == undefined)
-        return undefined
-
-      this.questions.push(question)
-    }
-
-    return this
-  }
-}
+import * as constants from '@/constants';
+import { TextOption } from './option/textoption';
 
 export class QuizSessionMin {
-  uuid: string
-  user: string;
-  start: number;
-  end: number;
-  score: number;
+  uuid: string = "";
+  user: string = "";
+  start: number = 0;
+  finish: number = 0;
+  score: number | undefined = undefined;
 
-  constructor() {
-    this.uuid = '';
-    this.user = '';
-    this.start = 0;3
-    this.end = 0;
-    this.score = 0;
+  public constructor(init?:Partial<QuizSessionMin>) {
+    Object.assign(this, init);
   }
 
-  async select(db_client: Client, session_uuid: string): Promise<QuizSessionMin | undefined> {
+  async select(session_uuid: string): Promise<QuizSessionMin | undefined> {
     let full: QuizSession | undefined = new QuizSession;
-    full = await full.select(db_client, session_uuid);
+    full = await full.select(session_uuid);
     if (full == undefined)
       return undefined;
 
     this.uuid = full.uuid;
     this.user = full.user;
-    this.score = full.score;
     this.start = full.start;
-    this.end = full.end;
+    this.finish = full.finish;
+    this.score = full.score;
 
     return this
   }
@@ -143,29 +36,41 @@ export class QuizSessionMin {
 
 // quiz_x_users in database
 export class QuizSession extends QuizSessionMin {
-  quiz: QuizWithSelectedOptions;
+  quiz: Quiz = new Quiz;
 
-  constructor() {
-    super()
-    this.quiz = new QuizWithSelectedOptions;
+  public constructor(init?:Partial<QuizSession>) {
+    super();
+    Object.assign(this, init);
   }
 
-  async select(db_client: Client, session_uuid: string): Promise<QuizSession | undefined> {  
+  async select(session_uuid: string): Promise<QuizSession | undefined> {
+    let session_dbres: any;
+    let answers_dbres: any;
+    
+    let db_client = db.Postgres.client();
+    db_client.connect(); {
+      try {
+        // get session data
+        session_dbres = await db_client.query(db.Postgres.get('quiz/session/select_session') as string, [session_uuid]);
+        if (session_dbres.rows[0] == undefined)
+          return undefined;
+        
+        // get user's answers data
+        answers_dbres = await db_client.query(db.Postgres.get('quiz/session/select_answers') as string, [session_uuid]);
+      } catch(e: any) {
+        logger.debug(e);
+        return undefined;
+      }
+    } db_client.end();
+
+    // save session data
     this.uuid = session_uuid;
-    let session_dbres = await db_client.query(db.Postgres.get('quiz/session/select_session') as string, [session_uuid]);
-    if (session_dbres.rows[0] == undefined)
-      return undefined;
     this.user = session_dbres.rows[0]['user'];
     this.start = session_dbres.rows[0]['start'];
-    this.end = session_dbres.rows[0]['end'];
-    
-    let ok = await this.quiz.select(db_client, session_dbres.rows[0]['quiz']);
-    if (ok == undefined)
-      return undefined;
+    this.finish = session_dbres.rows[0]['finish'];
 
-    // get user's choice
-    let answers_dbres = await db_client.query(db.Postgres.get('quiz/session/select_answers') as string, [session_uuid])
-    let answers_map: Map<string, Set<string>> = new Map<string, Set<string>>()
+    // save user's answers data
+    let answers_map: Map<string, Set<string>> = new Map<string, Set<string>>();
     for (const answer of answers_dbres.rows) {
       if (answers_map.has(answer['question'])) {
         answers_map.set(answer['question'], answers_map.get(answer['question'])?.add(answer['answer'])!);
@@ -174,43 +79,68 @@ export class QuizSession extends QuizSessionMin {
         answers_map.set(answer['question'], answers_map.get(answer['question'])?.add(answer['answer'])!);
       }
     }
+
+    // get quiz
+    let ok = await this.quiz.select(session_dbres.rows[0]['quiz']);
+    if (ok == undefined)
+      return undefined;
+    
     // sum score
+    this.score = 0;
     for (let question of this.quiz.questions) {
       let notok: number = 0;
-      for (let option of question.options) {
-        if (answers_map.has(question.uuid))
-          if (answers_map.get(question.uuid)?.has(option.uuid))
-            option.selected = true;
-        
-        if (option.selected != option.is_correct)
-          notok++;
+      if (question.type == constants.QUESTION_WITH_TEXT_OPTIONS) {
+        for (let option of (question as QuestionWithOptions).options) {
+          if (question.type == constants.QUESTION_WITH_TEXT_OPTIONS) {
+            if (answers_map.has(question.uuid)) {
+              if (answers_map.get(question.uuid)?.has(option.uuid!))
+                (option as TextOption).is_selected = true;
+            } else {
+              (option as TextOption).is_selected = false;
+            }
+            
+            if ((option as TextOption).is_selected != (option as TextOption).is_correct)
+              notok++;
+          }
+        }
       }
+
       if (notok == 0)
         this.score++;
     }
-  
+
     return this;
   }
 }
 
 export class QuizSessions {
-  quiz: QuizMin
-  sessions: QuizSessionMin[];
+  quiz: QuizMin = new QuizMin;
+  sessions: QuizSessionMin[] = []; 
 
-  constructor() {
-    this.quiz = new QuizMin
-    this.sessions = []
+  public constructor(init?:Partial<QuizSessions>) {
+    Object.assign(this, init);
   }
 
-  async select(db_client: Client, quiz_uuid: string, limit: number, offset: number): Promise<QuizSessions | undefined> {
-    let ok = this.quiz.select(db_client, quiz_uuid)
+  async select(quiz_uuid: string, limit: number, offset: number): Promise<QuizSessions | undefined> {
+    let ok = this.quiz.select(quiz_uuid)
     if (ok == undefined)
       return undefined;
 
-    let sessions_dbres = await db_client.query(db.Postgres.get('quiz/session/select_quiz_sessions')!, [quiz_uuid, limit, offset]);
+    let sessions_dbres: any;
+
+    let db_client = db.Postgres.client();
+    db_client.connect(); {
+      try {
+        sessions_dbres = await db_client.query(db.Postgres.get('quiz/session/select_quiz_sessions')!, [quiz_uuid, limit, offset]);
+      } catch(e: any) {
+        logger.debug(e);
+        return undefined;
+      }
+    } db_client.end();
+    
     for (let session_row of sessions_dbres.rows) {
       let session: QuizSessionMin = new QuizSessionMin;
-      await session.select(db_client, session_row['uuid']);
+      await session.select(session_row['uuid']);
       this.sessions.push(session)
     }
     return this;

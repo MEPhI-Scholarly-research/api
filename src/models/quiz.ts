@@ -1,151 +1,78 @@
-import { Client } from 'pg'
+import { logger } from "@/logger";
+import * as db from "@/database";
 
-import { logger } from '@/logger'
-import * as db from '@/db'
+import { QuestionMin } from "./question/questionmin";
+import { AbstractQuestion } from "./question/abstractquestion"
+import { QuestionWithOptions } from "./question/questionwithoptions";
+import { QuizMin } from "./quizmin";
 
-export class Option {
-  uuid: string
-  question: string
-  title: string
-  serial: number
-  is_correct: boolean
-
-  constructor() {
-    this.uuid = ''
-    this.question = ''
-    this.title = ''
-    this.serial = 0
-    this.is_correct = false
-  }
-}
-
-export class Question {
-  uuid: string
-  type: number
-  title: string
-  quiz: string
-  description: string
-  serial: number
-  options: Option[]
-
-  constructor() {
-    this.uuid = ''
-    this.type = 0
-    this.title = ''
-    this.quiz = ''
-    this.description = ''
-    this.serial = 0
-    this.options = []
-  }
-
-  // select options for with question
-  async selectOptions(db_client: Client, question_uuid: string): Promise<Question | undefined> {
-    let result_options = await db_client.query(db.Postgres.get('quiz/select_options')!, [question_uuid])
-    if (result_options.rows[0] == undefined) {
-      logger.debug('undefined result_options');
-      return undefined;
-    }
-
-    for (const row_option of result_options.rows) {
-      let option: Option = new Option()
-
-      option.uuid = row_option['uuid']
-      option.title = row_option['title']
-      option.serial = row_option['serial']
-      option.is_correct = row_option['is_correct']
-
-      this.options.push(option)
-    }
-
-    return this;
-  }
-}
-
-
-
-export class QuizMin {
-  uuid: string
-  owner: string
-  type: number
-  title: string
-  description: string
-  time_limit: number
-
-  constructor() {
-    this.uuid = ''
-    this.owner = ''
-    this.type = 0
-    this.title = ''
-    this.description = ''
-    this.time_limit = 0
-  }
-
-  async select(db_client: Client, quiz_uuid: string): Promise<QuizMin | undefined> {
-    // select quiz meta
-    let result_quiz = await db_client.query(db.Postgres.get('quiz/select_quiz')!, [quiz_uuid])
-    if (result_quiz.rows[0] == undefined) {
-      logger.debug('undefined result_quiz');
-      return undefined;
-    }
-    var row_quiz = result_quiz.rows[0]
-
-    this.uuid = quiz_uuid
-    this.owner = row_quiz['owner']
-    this.type = row_quiz['type']
-    this.title = row_quiz['title']
-    this.description = row_quiz['description']
-    this.time_limit = row_quiz['time_limit']
-
-    return this
-  }
-}
 
 export class Quiz extends QuizMin {
-  questions: Question[]
+  questions: AbstractQuestion[] = []
 
-  constructor() {
+  public constructor(init?:Partial<Quiz>) {
     super()
-    this.questions = []
+    Object.assign(this, init);
   }
 
-  override async select(db_client: Client, quiz_uuid: string): Promise<Quiz | undefined> {
-    // select quiz meta
-    let result_quiz = await db_client.query(db.Postgres.get('quiz/select_quiz')!, [quiz_uuid])
-    if (result_quiz.rows[0] == undefined) {
-      logger.debug('undefined result_quiz');
-      return undefined;
+  override async select(quiz_uuid: string): Promise<Quiz | undefined> {
+    let owner_uuid = "";
+
+    let db_client = db.Postgres.client();
+    await db_client.connect(); {
+      try {
+        // select quiz meta
+        let quiz_dbres = await db_client.query(db.Postgres.get("quiz/select_quiz")!, [quiz_uuid])
+        if (quiz_dbres.rows[0] == undefined)
+          return undefined;
+        
+        this.uuid = quiz_uuid
+        owner_uuid = quiz_dbres.rows[0]["owner"]
+        this.type = quiz_dbres.rows[0]["type"]
+        this.title = quiz_dbres.rows[0]["title"]
+        this.description = quiz_dbres.rows[0]["description"]
+        this.time_limit = quiz_dbres.rows[0]["time_limit"]
+
+        // select quiz questions
+        let result_questions = await db_client.query(db.Postgres.get("quiz/select_questions")!, [quiz_uuid])
+        if (result_questions.rows[0] == undefined)
+          return undefined;
+
+        for (const row_question of result_questions.rows) {
+          let question: QuestionMin | undefined = new QuestionMin({
+            uuid: row_question["uuid"],
+            quiz: row_question["quiz"],
+            type: row_question["type"],
+            title: row_question["title"],
+            description: row_question["description"],
+            serial: row_question["serial"]
+          });
+
+          this.questions.push(question);
+        }
+      } catch(e: any) {
+        logger.debug(e);
+        return undefined;
+      }
+    } await db_client.end();
+
+    for (let i in this.questions) {
+      let certain: AbstractQuestion | undefined;
+      if (this.questions[i].type == 1)
+        certain = new QuestionWithOptions;
+      else
+        certain = new QuestionMin
+
+      certain = await certain.select(this.questions[i].uuid);
+      if (certain == undefined)
+        return undefined;
+      this.questions[i] = certain!;
     }
-    var row_quiz = result_quiz.rows[0]
 
-    this.uuid = quiz_uuid
-    this.owner = row_quiz['owner']
-    this.type = row_quiz['type']
-    this.title = row_quiz['title']
-    this.description = row_quiz['description']
-    this.time_limit = row_quiz['time_limit']
-
-    // select quiz questions
-    let result_questions = await db_client.query(db.Postgres.get('quiz/select_questions')!, [quiz_uuid])
-    if (result_questions.rows[0] == undefined) {
-      logger.debug('undefined result_questions');
-      return undefined;
-    }
-
-    for (const row_question of result_questions.rows) {
-      let question: Question | undefined = new Question()
-      
-      question.uuid = row_question['uuid']
-      question.type = row_question['type']
-      question.title = row_question['title']
-      question.description = row_question['description']
-      question.serial = row_question['serial']
-
-      question = await question.selectOptions(db_client, question.uuid)
-      if (question == undefined)
-        return undefined
-
-      this.questions.push(question)
-    }
+    // select user
+    await this.owner.select(owner_uuid);
+    this.owner.username = undefined;
+    this.owner.passhash = undefined;
 
     return this
   }

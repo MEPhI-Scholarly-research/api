@@ -1,31 +1,24 @@
-# API
-
 ## Project Setup
 
-```bash
-make build
-```
-
-<!-- ## Project Setup
-
 ```sh
-npm install
-npm install ts-node --save-dev
+make install
 ```
 ### Dev run
 
 ```sh
-npm run start
-```
-
-### Build
-
-```sh
-npm run build
+make start-debug
 ```
 
 ### Production run
 
 ```sh
-npm run start:production
-``` -->
+make start
+```
+
+### Tests
+
+```sh
+make run-tests
+make run-unit-tests
+make run-end-to-end-tests
+```

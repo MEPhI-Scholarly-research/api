@@ -14,7 +14,7 @@ const routesIIFE = (app: Express) => {
   app.post(basePath+"/quiz/", errorMiddleware, authMiddleware, quizPost);
   app.get(basePath+"/quiz/:uuid", errorMiddleware, authMiddleware, quizUuidGet);
   app.patch(basePath+"/quiz/:uuid/start", errorMiddleware, authMiddleware, quizUuidStartGet);
-  app.get(basePath+"/quiz/:uuid/results", errorMiddleware, quizUuidSessionsGet)
+  app.get(basePath+"/quiz/:uuid/sessions", errorMiddleware, quizUuidSessionsGet)
   app.get(basePath+"/quiz/session/:uuid", errorMiddleware, quizSessionUuidGet)
 
   // user

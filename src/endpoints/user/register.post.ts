@@ -1,4 +1,4 @@
-import * as db from '@/db';
+import * as db from '@/database';
 
 import * as crypto from '@/crypto';
 import { Request, Response } from "express";

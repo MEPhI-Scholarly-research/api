@@ -69,13 +69,13 @@ def answer_process(user, quiz_uuid):
   sio.connect('http://localhost:3001')
   sio.emit('message', data='{"type":"connection", "token":"'+sessionToken+'"}')
   time.sleep(1)
-  question = resData['quiz']['questions'][0]['uuid']
-  option = resData['quiz']['questions'][0]['options'][0]['uuid']
+  question = resData['session']['quiz']['questions'][0]['uuid']
+  option = resData['session']['quiz']['questions'][0]['options'][0]['uuid']
   sio.emit('message', data='{"type":"answer", "question":"'+question+'", "answer":"'+option+'"}')
-  option = resData['quiz']['questions'][0]['options'][2]['uuid']
+  option = resData['session']['quiz']['questions'][0]['options'][2]['uuid']
   sio.emit('message', data='{"type":"answer", "question":"'+question+'", "answer":"'+option+'"}')
-  question = resData['quiz']['questions'][1]['uuid']
-  option = resData['quiz']['questions'][1]['options'][0]['uuid']
+  question = resData['session']['quiz']['questions'][1]['uuid']
+  option = resData['session']['quiz']['questions'][1]['options'][0]['uuid']
   sio.emit('message', data='{"type":"answer", "question":"'+question+'", "answer":"'+option+'"}')
   time.sleep(1)
   sio.emit('message', data='{"type":"finish", "token":"'+sessionToken+'"}')

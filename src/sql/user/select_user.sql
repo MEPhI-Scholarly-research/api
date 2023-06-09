@@ -1,1 +1,0 @@
-SELECT "uuid", "displayname", "passhash" FROM quan.users WHERE "username"=$1

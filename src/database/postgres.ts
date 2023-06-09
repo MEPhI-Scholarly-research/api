@@ -21,15 +21,18 @@ class PostgersDB {
     }
 
     this.set("user/insert_user");
-    this.set("user/select_user");
+    this.set("user/select_user_username");
+    this.set("user/select_user_uuid");
     this.set("user/insert_token");
     this.set("user/select_token");
 
     this.set("quiz/insert_option");
     this.set("quiz/insert_question");
+    this.set("quiz/select_question");
     this.set("quiz/insert_quiz");
     this.set("quiz/select_options");
     this.set("quiz/select_questions");
+    this.set("quiz/select_question");
     this.set("quiz/select_quiz");
 
     this.set("quiz/session/start_quiz");
