@@ -39,8 +39,12 @@ CREATE TABLE quan.question_types (
   "id" SERIAL PRIMARY KEY,
   "textid" TEXT NOT NULL UNIQUE,
   "title" TEXT NOT NULL,
-  "description" TEXT NOT NULL,
-  "created" TIMESTAMP NOT NULL DEFAULT now()
+  "description" TEXT NOT NULL
+);
+
+CREATE TABLE quan.attachment_types (
+  "id" SERIAL PRIMARY KEY,
+  "textid" TEXT NOT NULL UNIQUE
 );
 
 -- quizzes
@@ -90,9 +94,23 @@ CREATE TABLE quan.options (
   "serial" INTEGER NOT NULL DEFAULT 0,
   "is_correct" BOOLEAN NOT NULL DEFAULT FALSE,
 
-  CONSTRAINT fk_answer_options__question__questions_pk
+  CONSTRAINT fk_options__question__questions_pk
     FOREIGN KEY("question")
       REFERENCES quan.questions("uuid")
+);
+
+CREATE TABLE quan.attachments (
+  type INTEGER NOT NULL,
+  url TEXT NOT NULL,
+  owner TEXT,
+  object TEXT NOT NULL,
+
+  CONSTRAINT fk_attachments__owner__users_pk
+    FOREIGN KEY("owner")
+      REFERENCES quan.users("uuid"),
+  CONSTRAINT fk_attachments__type__attachment_types_pk
+    FOREIGN KEY("type")
+      REFERENCES quan.attachment_types("id")
 );
 
 -- relations
