@@ -61,7 +61,7 @@ export async function loginPost(req: User, res: Response) {
   client = db.Postgres.client();
   await client.connect();
   try {
-    const result = await client.query( db.Postgres.get("user/insert_token")!, [secret_key]);
+    const result = await client.query( db.Postgres.get("user/insert_token")!, [secret_key, user]);
     token_uuid = result.rows[0]['uuid']
   } catch(e) {
     console.log(e)

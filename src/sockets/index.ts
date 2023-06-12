@@ -14,12 +14,12 @@ function socketIIFE(server: HttpServer) {
   });
 
   io.on("connection", (socket) => {
-    logger.info(`SOCKET CONNECTED: ${socket.id}`);
+    logger.info(`socket connected: ${socket.id}`);
 
     quizProcess(socket);
 
     socket.on("disconnect", () => {
-      logger.info(`SOCKETS DISCONNECTED: ${socket.id}`);
+      logger.info(`socket disconnected: ${socket.id}`);
     });
   });
 

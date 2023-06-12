@@ -1,1 +1,1 @@
-SELECT "salt" FROM quan.tokens WHERE "uuid"=$1
+SELECT "salt", "owner" FROM quan.tokens WHERE "uuid"=$1

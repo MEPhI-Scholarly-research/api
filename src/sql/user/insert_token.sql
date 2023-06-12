@@ -1,1 +1,1 @@
-INSERT INTO quan.tokens ("salt") VALUES ($1) RETURNING "uuid"
+INSERT INTO quan.tokens ("salt", "owner") VALUES ($1, $2) RETURNING "uuid"

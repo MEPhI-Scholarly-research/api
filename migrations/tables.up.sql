@@ -17,8 +17,13 @@ CREATE TABLE quan.users (
 
 CREATE TABLE quan.tokens (
   "uuid" TEXT PRIMARY KEY DEFAULT uuid_generate_v4(),
+  "owner" TEXT NOT NULL,
   "salt" TEXT NOT NULL,
-  "created" TIMESTAMP NOT NULL DEFAULT now()
+  "created" TIMESTAMP NOT NULL DEFAULT now(),
+
+  CONSTRAINT fk_tokens__owner__users_pk
+    FOREIGN KEY("owner")
+      REFERENCES quan.users("uuid")
 );
 
 -- types
@@ -130,9 +135,11 @@ CREATE TABLE quan.users_x_questions (
 INSERT INTO quan.quiz_types (
   "id", "textid", "title", "description"
 ) VALUES (
-  1, 'time_limited', 'Time limited', 'Quiz with time interval to complete the entire quiz / all questions.'
+  1, 'time_limited', 'Time limited', 
+  'Quiz with time interval to complete the entire quiz / all questions.'
 ), (
-  2, 'strict_time_limited', 'Strict time limited', 'Quiz with time intervals for every question.'
+  2, 'strict_time_limited', 'Strict time limited', 
+  'Quiz with time intervals for every question.'
 );
 
 INSERT INTO quan.question_types (
